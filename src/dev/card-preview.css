@@ -1,0 +1,90 @@
+/* 卡片视觉校验页样式（开发用，不参与主应用） */
+.pv {
+  padding: 20px 24px 40px;
+}
+.pv__head {
+  margin-bottom: 18px;
+}
+.pv__head h1 {
+  font-size: 19px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+.pv__sub {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.pv__nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.pv__link {
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  font-size: 12px;
+  text-decoration: none;
+  color: var(--text-dim);
+}
+.pv__link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pv__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  align-items: flex-start;
+  padding: 18px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.pv__frame {
+  margin: 0;
+}
+.pv__cap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+}
+.pv__cap b {
+  font-weight: 700;
+}
+.pv__note {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* 舞台留出外发光与放大的空间，避免被裁切 */
+.pv__stage {
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-soft);
+  background: repeating-conic-gradient(rgba(128, 128, 128, 0.12) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+}
+
+.pv__ref {
+  display: block;
+  border: 1px solid var(--line);
+  image-rendering: auto;
+}
+
+.pv__foot {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+.pv__foot b {
+  color: var(--accent);
+}

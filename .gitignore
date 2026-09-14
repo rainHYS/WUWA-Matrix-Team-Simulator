@@ -1,0 +1,34 @@
+# ---------------- 依赖与构建产物 ----------------
+node_modules/
+dist/
+dist-offline/
+_pkg/
+*.zip
+.npm-cache/
+.vite/
+
+# public/assets 由 `npm run prepare-assets` 从「图片素材/」生成，属构建产物；
+# dev / build 脚本都会自动先跑一遍，所以不入库（省 12MB 重复图片）
+public/assets/
+
+# 交互回归截图，由 `npm run check` 重新生成，体积大不入库
+docs/screenshots/
+
+# ---------------- 本地存档 / 调试 ----------------
+.dsh-meow/
+.edge-profile/
+.shots/
+*.local
+*.log
+
+# ---------------- 环境变量 ----------------
+.env
+.env.*
+!.env.example
+
+# ---------------- 编辑器 / 系统 ----------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

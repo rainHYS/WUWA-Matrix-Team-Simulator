@@ -1,0 +1,27 @@
+{
+  "name": "wuwa-matrix-team-simulator",
+  "private": true,
+  "version": "0.7.0",
+  "type": "module",
+  "description": "鸣潮·终焉矩阵配队模拟器 — 纯前端组队配置工具",
+  "scripts": {
+    "prepare-assets": "node scripts/prepare-assets.mjs",
+    "dev": "node scripts/prepare-assets.mjs && vite",
+    "build": "node scripts/prepare-assets.mjs && vite build",
+    "build:offline": "node scripts/prepare-assets.mjs && vite build --config vite.config.offline.js",
+    "package": "node scripts/package.mjs",
+    "serve": "node scripts/serve.mjs 4173",
+    "start": "node scripts/serve.mjs 4173 --open",
+    "check": "node scripts/visual-check.mjs",
+    "preview": "vite preview --port 4173",
+    "set-version": "node scripts/set-version.mjs"
+  },
+  "dependencies": {
+    "pinia": "^2.3.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.11"
+  }
+}

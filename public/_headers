@@ -1,0 +1,9 @@
+# 用于 Cloudflare Pages 的响应头配置
+# （Cloudflare Pages 会自动读取 dist/_headers；本文件位于 public/，构建时被复制进 dist）
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

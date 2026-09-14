@@ -1,0 +1,114 @@
+{
+  "$meta": {
+    "name": "鸣潮·终焉矩阵配队模拟器 — 角色基础数据",
+    "source": "《角色属性对照表.xlsx》（用户提供，含「共鸣模态」列）+ 用户口头澄清（2026-09-10）",
+    "generatedFor": "前端初始化角色池数据",
+    "elementEnum": ["热熔", "冷凝", "气动", "导电", "衍射", "湮灭"],
+    "modeEnum": ["霜渐", "声骸", "震谐", "聚爆", "集谐"],
+    "notes": [
+      "本文件是『基础角色数据』，不含期状态（当期剩余/已用次数）——期状态属 period 状态，切期重置。",
+      "除下方 stamina≠1 的角色外，其余角色体力值一律为 1。",
+      "漂泊者按属性拆 4 张卡（衍射/湮灭/气动/导电），四张卡 costGroup 相同、共用同一体力池，全矩阵合计仅可登场 1 次。",
+      "漂泊者四张卡目前共用同一张立绘（用户确认：只有这一张通用立绘，四属性共用）。",
+      "「共鸣模态」列（2026-09-10 用户补表）：共 4 位角色有模态——洛瑟菈 霜渐/声骸、爱弥斯 震谐/聚爆、达尼娅 聚爆/集谐、琳奈 震谐/集谐。模态切换属独立机制，不改变『以谁上场』的占用语义。"
+    ]
+  },
+
+  "roster": [
+    { "id": "sanhua",      "name": "散华",        "star": 4, "element": "冷凝" },
+    { "id": "baizhi",      "name": "白芷",        "star": 4, "element": "冷凝", "stamina": 2 },
+    { "id": "lingyang",    "name": "凌阳",        "star": 5, "element": "冷凝" },
+    { "id": "zhezhi",      "name": "折枝",        "star": 5, "element": "冷凝" },
+    { "id": "youhu",       "name": "釉瑚",        "star": 4, "element": "冷凝" },
+    { "id": "calcharo",    "name": "珂莱塔",      "star": 5, "element": "冷凝" },
+    { "id": "lossera",     "name": "洛瑟菈",      "star": 5, "element": "冷凝", "modes": ["霜渐", "声骸"] },
+    { "id": "feixue",      "name": "绯雪",        "star": 5, "element": "冷凝" },
+    { "id": "suisui",      "name": "穗穗",        "star": 5, "element": "冷凝", "stamina": 2 },
+
+    { "id": "chixia",      "name": "炽霞",        "star": 4, "element": "热熔" },
+    { "id": "encore",      "name": "安可",        "star": 5, "element": "热熔" },
+    { "id": "mortefi",     "name": "莫特斐",      "star": 4, "element": "热熔" },
+    { "id": "changli",     "name": "长离",        "star": 5, "element": "热熔" },
+    { "id": "brant",       "name": "布兰特",      "star": 5, "element": "热熔" },
+    { "id": "lupa",        "name": "露帕",        "star": 5, "element": "热熔" },
+    { "id": "gabrielina",  "name": "嘉贝莉娜",    "star": 5, "element": "热熔" },
+    { "id": "moning",      "name": "莫宁",        "star": 5, "element": "热熔", "stamina": 2 },
+    { "id": "emis",        "name": "爱弥斯",      "star": 5, "element": "热熔", "modes": ["震谐", "聚爆"] },
+    { "id": "daniya",      "name": "达尼娅",      "star": 5, "element": "热熔", "modes": ["聚爆", "集谐"] },
+    { "id": "jingran",     "name": "景燃",        "star": 5, "element": "热熔" },
+
+    { "id": "kakaro",      "name": "卡卡罗",      "star": 5, "element": "导电" },
+    { "id": "yinlin",      "name": "吟霖",        "star": 5, "element": "导电" },
+    { "id": "yuanwu",      "name": "渊武",        "star": 4, "element": "导电" },
+    { "id": "xiangliyao",  "name": "相里要",      "star": 5, "element": "导电" },
+    { "id": "dengdeng",    "name": "灯灯",        "star": 4, "element": "导电" },
+    { "id": "augusta",     "name": "奥古斯塔",    "star": 5, "element": "导电" },
+    { "id": "buling",      "name": "卜灵",        "star": 4, "element": "导电", "stamina": 2 },
+    { "id": "rebecca",     "name": "丽贝卡",      "star": 5, "element": "导电" },
+    { "id": "rover_elec",  "name": "漂泊者·导电", "star": 5, "element": "导电", "costGroup": "rover" },
+    { "id": "xin",         "name": "心",          "star": 5, "element": "导电" },
+    { "id": "suoming",     "name": "锁瞑",        "star": 5, "element": "导电" },
+
+    { "id": "rover_aero",  "name": "漂泊者·气动", "star": 5, "element": "气动", "costGroup": "rover" },
+    { "id": "yangyang",    "name": "秧秧",        "star": 4, "element": "气动" },
+    { "id": "qiushui",     "name": "秋水",        "star": 4, "element": "气动" },
+    { "id": "jiyan",       "name": "忌炎",        "star": 5, "element": "气动" },
+    { "id": "jianxin",     "name": "鉴心",        "star": 5, "element": "气动" },
+    { "id": "xiakong",     "name": "夏空",        "star": 5, "element": "气动" },
+    { "id": "cartethyia",  "name": "卡提希娅",    "star": 5, "element": "气动" },
+    { "id": "yuno",        "name": "尤诺",        "star": 5, "element": "气动" },
+    { "id": "qiuyuan",     "name": "仇远",        "star": 5, "element": "气动" },
+    { "id": "sigrika",     "name": "西格莉卡",    "star": 5, "element": "气动" },
+    { "id": "qingxiao",    "name": "清宵",        "star": 5, "element": "气动" },
+
+    { "id": "verina",      "name": "维里奈",      "star": 5, "element": "衍射", "stamina": 2 },
+    { "id": "rover_spectro","name": "漂泊者·衍射","star": 5, "element": "衍射", "costGroup": "rover" },
+    { "id": "jinhsi",      "name": "今汐",        "star": 5, "element": "衍射" },
+    { "id": "shorekeeper", "name": "守岸人",      "star": 5, "element": "衍射", "stamina": 2 },
+    { "id": "phoebe",      "name": "菲比",        "star": 5, "element": "衍射" },
+    { "id": "zani",        "name": "赞妮",        "star": 5, "element": "衍射" },
+    { "id": "linnai",      "name": "琳奈",        "star": 5, "element": "衍射", "modes": ["震谐", "集谐"] },
+    { "id": "luhesi",      "name": "陆·赫斯",     "star": 5, "element": "衍射" },
+    { "id": "lucy",        "name": "露西",        "star": 5, "element": "衍射" },
+
+    { "id": "taoqi",       "name": "桃祈",        "star": 4, "element": "湮灭" },
+    { "id": "danjin",      "name": "丹瑾",        "star": 4, "element": "湮灭" },
+    { "id": "camellya",    "name": "椿",          "star": 5, "element": "湮灭" },
+    { "id": "rover_havoc", "name": "漂泊者·湮灭", "star": 5, "element": "湮灭", "costGroup": "rover" },
+    { "id": "rococo",      "name": "洛可可",      "star": 5, "element": "湮灭" },
+    { "id": "cantarella",  "name": "坎特蕾拉",    "star": 5, "element": "湮灭" },
+    { "id": "phrolova",    "name": "弗洛洛",      "star": 5, "element": "湮灭" },
+    { "id": "chisa",       "name": "千咲",        "star": 5, "element": "湮灭" },
+    { "id": "yangyang_xuanling", "name": "秧秧·玄翎", "star": 5, "element": "湮灭" }
+  ],
+
+  "staminaRules": {
+    "default": 1,
+    "override": ["白芷", "穗穗", "维里奈", "守岸人", "卜灵", "莫宁"],
+    "note": "以上 6 位体力值 = 2（奶妈/辅助），其余全部 = 1；漂泊者全部形态合计 1。"
+  },
+
+  "assets": {
+    "root": "图片素材",
+    "art":      { "dir": "共鸣者立绘", "size": "240x320", "naming": "{角色名}_立绘.png", "note": "漂泊者四形态共用同一张图" },
+    "element":  { "dir": "属性图标",   "size": "90x90",   "naming": "{属性名}.png", "files": ["热熔", "冷凝", "气动", "导电", "衍射", "湮灭"] },
+    "starBand": { "dir": "边框素材",   "size": "360x360", "naming": "{N}星.png",
+                  "note": "不是外框！顶部 75% 完全透明，只有底部约 25% 是不透明波浪纹+星数；五星=金色光带+5 星、四星=紫色光带+4 星，需贴到卡片底部",
+                  "files": ["五星", "四星"] },
+    "preview":  { "dir": "样例", "files": { "未选中效果": "151x251", "选中效果": "160x260" } }
+  },
+
+  "stats": {
+    "total": 60,
+    "byElement": { "冷凝": 9, "热熔": 11, "导电": 11, "气动": 11, "衍射": 9, "湮灭": 9 },
+    "byStar": { "5": 49, "4": 11 },
+    "stamina2count": 6
+  },
+
+  "dataFixes": [
+    { "type": "duplicate", "detail": "原表格『漂泊者·气动』重复 2 行（第 33、39 行），用户确认多写一份，已删除；气动角色由 12 项修正为 11 项。" },
+    { "type": "value",     "detail": "『卜灵』体力值由 1 修正为 2（用户口头补充）。" },
+    { "type": "value",     "detail": "『莫宁』体力值由 1 修正为 2（用户 2026-09-10 指出：莫宁应默认有两点体力）。" },
+    { "type": "typo",      "detail": "原表格『达妮娅』与立绘文件名『达尼娅』不一致，统一采用『达尼娅』。" }
+  ]
+}

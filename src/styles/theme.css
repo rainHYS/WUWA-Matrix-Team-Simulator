@@ -1,0 +1,82 @@
+/* ============================================================
+ * 主题变量 —— 深色为主 + 浅色并存，支持昼夜（明暗）切换
+ * 切换方式：<html data-theme="dark|light">
+ * ============================================================ */
+
+:root {
+  /* ---- 卡片几何：以样例图 151×251 为基准，按 --card-w 等比缩放 ---- */
+  --card-w: 151px;
+  --card-h: calc(var(--card-w) * 1.66225); /* 251 / 151 */
+  --card-name-h: calc(var(--card-w) * 0.3); /* 名牌条 ≈ 45 / 151 */
+  --card-radius: calc(var(--card-w) * 0.028);
+  /* 选中态：需求决策 §13 —— scale(1.06) + 香槟金描边 + 金色外发光 */
+  --card-select-scale: 1.06;
+
+  /* ---- 鸣潮香槟金 ---- */
+  --gold: #bb9f5e;
+  --gold-soft: #d8c48c;
+  --gold-bright: #f7eba6;
+
+  /* ---- 六属性配色（图标自带色，此处用于描边/徽记底盘/标签） ---- */
+  --el-fusion: #e5543a;
+  --el-glacio: #4aa8f0;
+  --el-aero: #35c9a0;
+  --el-electro: #b45cff;
+  --el-spectro: #f0c64a;
+  --el-havoc: #d94a86;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.28);
+  --shadow-2: 0 8px 26px rgba(0, 0, 0, 0.4);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---------------- 深色（默认） ---------------- */
+:root,
+html[data-theme='dark'] {
+  --bg: #101219;
+  --bg-grad: radial-gradient(1200px 600px at 20% -10%, #1c2233 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, #241d2e 0%, transparent 55%), #101219;
+  --panel: #191d28;
+  --panel-2: #212737;
+  --panel-3: #2a3145;
+  --line: #313a51;
+  --line-soft: #262d3e;
+  --text: #e9ecf5;
+  --text-dim: #98a1b8;
+  --text-faint: #6b7488;
+  --accent: var(--gold);
+  --accent-text: #1a1408;
+  --ok: #4ecb8f;
+  --warn: #f0b345;
+  --danger: #ef5f6b;
+  --slot-bg: rgba(255, 255, 255, 0.035);
+  --slot-bg-hover: rgba(187, 159, 94, 0.14);
+  --slot-line: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------------- 浅色 ---------------- */
+html[data-theme='light'] {
+  --bg: #eef0f5;
+  --bg-grad: radial-gradient(1200px 600px at 20% -10%, #ffffff 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, #f6f0e2 0%, transparent 55%), #eef0f5;
+  --panel: #ffffff;
+  --panel-2: #f6f7fb;
+  --panel-3: #eceff6;
+  --line: #d9dee9;
+  --line-soft: #e6eaf2;
+  --text: #1f2531;
+  --text-dim: #5d6678;
+  --text-faint: #8b93a5;
+  --accent: #a9863c;
+  --accent-text: #ffffff;
+  --ok: #1f9d63;
+  --warn: #b57a10;
+  --danger: #d33f4c;
+  --slot-bg: rgba(20, 26, 40, 0.035);
+  --slot-bg-hover: rgba(169, 134, 60, 0.13);
+  --slot-line: rgba(20, 26, 40, 0.1);
+  --shadow-1: 0 1px 2px rgba(30, 40, 60, 0.12);
+  --shadow-2: 0 8px 24px rgba(30, 40, 60, 0.16);
+}
