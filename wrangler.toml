@@ -1,0 +1,9 @@
+# Cloudflare Pages 项目配置
+# ------------------------------------------------------------
+# 把这个文件放进仓库，Cloudflare Pages 会读取 pages_build_output_dir，
+# 不必再依赖控制台里的手填设置（之前就是输出目录填错导致白屏）。
+#
+# name 必须与 Cloudflare Pages 上的项目名一致。
+name = "wuwa-matrix-team-simulator"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-09-23"
