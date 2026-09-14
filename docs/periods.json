@@ -5,26 +5,110 @@
       "本文件决定【所有访客】打开时看到的期次与强化配置。改完提交推送，Cloudflare 会自动重新构建，全员生效。",
       "推荐流程：在网页地址后加 #admin 打开后台 → 配好期次与强化 → 点「导出期次配置」→ 用它替换本文件 → 提交推送。",
       "periods[].id 一旦发布就不要再改（本地存档靠它关联期次）；改名字请只改 name。",
-      "enhancements 结构：{ 期次id: { 角色id: [ { id, text, staminaPlus } ] } }",
-      "  · text         = 强化效果原文（字符串，任意描述，如「伤害上升 20%」）",
-      "  · staminaPlus  = 特殊分支，>0 时该角色本期体力上限真实 +N；填 0 则只做文本展示",
-      "角色 id 见 docs/characters.json 的 roster[].id（如 sanhua / emis / rover_elec）。"
-    ],
-    "example": {
-      "enhancements": {
-        "p1": {
-          "sanhua": [{ "id": "e1", "text": "伤害上升 20%", "staminaPlus": 0 }],
-          "verina": [{ "id": "e2", "text": "治疗量提升，可多登场一次", "staminaPlus": 1 }]
-        }
-      }
-    }
+      "enhancements 结构：{ 期次id: { 角色id: [ { id, text, staminaPlus } ] } }"
+    ]
   },
-
   "periods": [
-    { "id": "p1", "name": "第 1 期", "sourceNote": "" }
+    {
+      "id": "p1",
+      "name": "S2 险境强袭",
+      "sourceNote": ""
+    }
   ],
-
   "currentPeriodId": "p1",
-
-  "enhancements": {}
+  "enhancements": {
+    "p1": {
+      "daniya": [
+        {
+          "id": "enh_mu19scze5eujh",
+          "text": "",
+          "staminaPlus": 1
+        }
+      ],
+      "yinlin": [
+        {
+          "id": "enh_mu1apzqmg3q3e",
+          "text": "角色最终伤害提升20%。施放共鸣解放时，队伍中的角色共鸣解放加成提升30%，持续30秒。",
+          "staminaPlus": 0
+        }
+      ],
+      "zhezhi": [
+        {
+          "id": "enh_mu1aqj0bn6f20",
+          "text": "角色最终伤害提升20%。施放共鸣解放时，队伍中的角色共鸣技能加成提升30%，持续30秒。",
+          "staminaPlus": 0
+        }
+      ],
+      "jinhsi": [
+        {
+          "id": "enh_mu1aqtmn5zt0y",
+          "text": "角色最终伤害提升25%。",
+          "staminaPlus": 0
+        }
+      ],
+      "changli": [
+        {
+          "id": "enh_mu1ar4vkw8y8n",
+          "text": "角色最终伤害提升25%。",
+          "staminaPlus": 0
+        }
+      ],
+      "jiyan": [
+        {
+          "id": "enh_mu1arc1y5xgx6",
+          "text": "角色最终伤害提升25%。",
+          "staminaPlus": 0
+        }
+      ],
+      "xiangliyao": [
+        {
+          "id": "enh_mu1arfv2hnvkf",
+          "text": "角色最终伤害提升25%。",
+          "staminaPlus": 0
+        }
+      ],
+      "rococo": [
+        {
+          "id": "enh_mu1arq1dldjas",
+          "text": "角色最终伤害提升20%。施放共鸣解放时，队伍中的角色湮灭伤害加成提升20%，持续30秒。",
+          "staminaPlus": 0
+        }
+      ],
+      "brant": [
+        {
+          "id": "enh_mu1arzwycbt41",
+          "text": "角色最终伤害提升25%。",
+          "staminaPlus": 0
+        }
+      ],
+      "cantarella": [
+        {
+          "id": "enh_mu1as81uh12xp",
+          "text": "角色最终伤害提升25%。",
+          "staminaPlus": 0
+        }
+      ],
+      "camellya": [
+        {
+          "id": "enh_mu1asdhaj3bo2",
+          "text": "角色最终伤害提升25%。",
+          "staminaPlus": 0
+        }
+      ],
+      "phoebe": [
+        {
+          "id": "enh_mu1asr04q17as",
+          "text": "角色最终伤害提升20%。施放共鸣解放时，队伍中的角色衍射伤害加成提升20%，持续30秒。",
+          "staminaPlus": 0
+        }
+      ],
+      "calcharo": [
+        {
+          "id": "enh_mu1at04rsnfkd",
+          "text": "角色最终伤害提升25%。",
+          "staminaPlus": 0
+        }
+      ]
+    }
+  }
 }
