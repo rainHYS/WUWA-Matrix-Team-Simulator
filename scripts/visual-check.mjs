@@ -683,6 +683,8 @@ async function main() {
       s.enhancements[s.currentPeriodId] = Object.fromEntries(
         ids.map((id) => [id, [{ id: 'regression', text: '伤害上升 20%', staminaPlus: 0 }]]),
       );
+      // ⚠️ 必须同时置 configDirty，否则刷新时会被仓库配置（docs/periods.json）覆盖掉
+      s.configDirty = true;
       localStorage.setItem('wuwa-matrix:v1', JSON.stringify(s));
       return ids.length;
     })()`)
@@ -813,6 +815,86 @@ async function main() {
     await cdp.shot('check-9-admin.png')
     await cdp.eval(`location.hash = ''`)
     await sleep(400)
+
+    /* ---------- 12. 期次配置发布通道（docs/periods.json） ---------- */
+    console.log('\n[12] 期次配置发布通道')
+    const lsState = () => cdp.eval(`JSON.parse(localStorage.getItem('wuwa-matrix:v1') || '{}')`)
+    const reload = async () => {
+      await cdp.send('Page.navigate', { url: URL_ })
+      await sleep(2600)
+      await cdp.eval(`window.confirm = () => true; window.alert = () => {};`)
+    }
+    const enhTotal = () =>
+      cdp.eval(`(() => {
+        const s = JSON.parse(localStorage.getItem('wuwa-matrix:v1'));
+        const cur = s.enhancements[s.currentPeriodId] || {};
+        return Object.values(cur).reduce((a, l) => a + l.length, 0);
+      })()`)
+
+    // 前面的步骤改过配置 → 先还原成「访客首次打开」的状态再断言
+    await cdp.eval(`(() => {
+      const s = JSON.parse(localStorage.getItem('wuwa-matrix:v1'));
+      s.configDirty = false;
+      s.enhancements = {};
+      localStorage.setItem('wuwa-matrix:v1', JSON.stringify(s));
+      return true;
+    })()`)
+    await reload()
+
+    const seeded = await lsState()
+    check(
+      '期次来自仓库配置 docs/periods.json',
+      JSON.stringify({ id: seeded.currentPeriodId, name: seeded.periods?.[0]?.name }),
+      (v) => {
+        const o = JSON.parse(v)
+        return o.id === 'p1' && o.name === '第 1 期'
+      },
+    )
+    check('访客态 configDirty 为 false', seeded.configDirty === true, false)
+
+    await cdp.eval(`location.hash = '#admin'`)
+    await sleep(800)
+    await cdp.eval(`window.confirm = () => true; window.alert = () => {};`)
+    await clickByText('.drawer__tab', '期次编辑')
+    await sleep(400)
+    const pubText = await cdp.eval(`document.querySelector('.pub')?.textContent || ''`)
+    check('有「发布到线上」提示块与导出按钮', pubText.includes('导出期次配置'), true)
+    check('未改动时显示「与仓库配置一致」', pubText.includes('与仓库配置一致'), true)
+
+    // 改一条强化 → configDirty 应变 true
+    await clickByText('.drawer__tab', '本期强化')
+    await sleep(400)
+    await setInput('.enh__text', '发布通道测试用')
+    await sleep(150)
+    await clickByText('.drawer__body .btn--primary', '添加')
+    await sleep(500)
+    check('改动强化后 configDirty 变 true', (await lsState()).configDirty, true)
+    await clickByText('.drawer__tab', '期次编辑')
+    await sleep(400)
+    check('状态标签变为「有未发布的改动」', await cdp.eval(`!!document.querySelector('.pub__dirty')`), true)
+    check(
+      '出现「放弃本地改动」按钮',
+      await cdp.eval(
+        `[...document.querySelectorAll('.pub .btn')].some(b=>b.textContent.includes('放弃本地改动'))`,
+      ),
+      true,
+    )
+    await cdp.shot('check-10-publish-channel.png')
+
+    // configDirty=true 时刷新 → 本地改动保留（运营能继续编辑）
+    await reload()
+    check('configDirty=true 时刷新保留本地强化', await enhTotal(), (v) => v >= 1)
+
+    // 模拟访客态（configDirty=false）刷新 → 仓库配置覆盖本地
+    await cdp.eval(`(() => {
+      const s = JSON.parse(localStorage.getItem('wuwa-matrix:v1'));
+      s.configDirty = false;
+      localStorage.setItem('wuwa-matrix:v1', JSON.stringify(s));
+      return true;
+    })()`)
+    await reload()
+    check('configDirty=false 时刷新，仓库配置覆盖本地（访客总拿到最新一期）', await enhTotal(), 0)
+    await cdp.shot('check-11-repo-config-wins.png')
 
     /* ---------- 汇总 ---------- */
     const failed = results.filter((r) => !r.ok)

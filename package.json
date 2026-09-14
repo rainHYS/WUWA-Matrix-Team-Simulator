@@ -1,7 +1,7 @@
 {
   "name": "wuwa-matrix-team-simulator",
   "private": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "type": "module",
   "description": "鸣潮·终焉矩阵配队模拟器 — 纯前端组队配置工具",
   "engines": {

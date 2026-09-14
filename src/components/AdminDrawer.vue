@@ -78,6 +78,32 @@ function resetStamina() {
   toast(n ? 'ok' : 'warn', n ? `已重置本期体力，清空 ${n} 个上阵位置` : '当前没有已上阵的角色')
 }
 
+/* ---------------- 期次配置的发布通道 ---------------- */
+/**
+ * 导出 docs/periods.json。
+ * 期次与强化属于「全局配置」：只有写进仓库文件并重新部署，才会对所有访客生效。
+ * 纯前端写不了磁盘，所以导出文件让运营自己替换提交。
+ */
+function exportPeriodConfig() {
+  try {
+    const cfg = store.exportPeriodConfig()
+    downloadText('periods.json', JSON.stringify(cfg, null, 2), 'application/json')
+    const n = Object.values(cfg.enhancements).reduce(
+      (a, byChar) => a + Object.values(byChar).reduce((b, l) => b + l.length, 0),
+      0,
+    )
+    toast('ok', `已导出 periods.json（${cfg.periods.length} 个期次 / ${n} 条强化）`)
+  } catch (err) {
+    toast('error', `导出失败：${err.message}`)
+  }
+}
+
+function resetToRepoConfig() {
+  if (!window.confirm('放弃本地未发布的期次/强化改动，恢复成仓库里已发布的那一份？\n（队伍编排也会一并清空）')) return
+  store.resetToRepoConfig()
+  toast('ok', '已恢复为仓库配置')
+}
+
 /* ---------------- 本期强化 ---------------- */
 const enhCharId = ref('')
 const enhText = ref('')
@@ -388,6 +414,33 @@ function hardReset() {
               >不做自动轮换与官方抓取</b
             >。期次名称录入后会<b>只读展示在顶栏正中</b>，用户不可更改。
           </p>
+
+          <!-- 发布通道：期次与强化是全局配置，必须写进仓库文件才对所有访客生效 -->
+          <div class="pub" :class="{ 'is-dirty': store.configDirty }">
+            <div class="pub__head">
+              <b class="pub__title">发布到线上</b>
+              <span v-if="store.configDirty" class="tag pub__dirty">有未发布的改动</span>
+              <span v-else class="tag pub__clean">与仓库配置一致</span>
+            </div>
+            <p class="pub__desc">
+              期次与强化是<b>全局配置</b> —— 这里的改动只存在你自己的浏览器里，
+              <b>其他访客看不到</b>。要让所有人看到，需要导出配置 → 替换仓库里的
+              <code>docs/periods.json</code> → 提交推送，Cloudflare 会自动重新部署。
+            </p>
+            <div class="row row--wrap">
+              <button class="btn btn--primary" type="button" @click="exportPeriodConfig">
+                导出期次配置 (.json)
+              </button>
+              <button
+                v-if="store.configDirty"
+                class="btn btn--ghost btn--danger"
+                type="button"
+                @click="resetToRepoConfig"
+              >
+                放弃本地改动，恢复仓库配置
+              </button>
+            </div>
+          </div>
 
           <ul class="plist">
             <li v-for="p in store.periods" :key="p.id" class="plist__item" :class="{ 'is-on': p.id === store.currentPeriodId }">
@@ -935,6 +988,52 @@ function hardReset() {
 }
 .enh-sum__clear {
   margin-left: 10px;
+}
+
+/* ---------------- 发布通道提示块 ---------------- */
+.pub {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-soft);
+  background: var(--panel-2);
+}
+.pub.is-dirty {
+  border-color: var(--warn);
+  background: rgba(240, 179, 69, 0.07);
+}
+.pub__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.pub__title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.pub__dirty {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+.pub__clean {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+.pub__desc {
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.pub__desc b {
+  color: var(--accent);
+}
+.pub__desc code {
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--panel-3);
+  font-size: 11px;
 }
 
 /* ---------------- 模态配置 ---------------- */

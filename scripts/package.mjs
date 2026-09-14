@@ -38,6 +38,7 @@ const SOURCE_ITEMS = [
   'src',
   'scripts',
   'docs/characters.json',
+  'docs/periods.json',
   'docs/db-schema.sql',
   '图片素材',
   'index.html',

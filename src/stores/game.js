@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { BASE_ROSTER } from '@/data/roster.js'
 import { elementByName } from '@/data/elements.js'
 import { loadState, saveState, clearState } from '@/utils/storage.js'
+import periodConfig from '../../docs/periods.json'
 
 /** 每支队伍固定 3 人 */
 export const SLOT_COUNT = 3
@@ -22,6 +23,55 @@ function makePeriod(name) {
   return { id: uid('period'), name, sourceNote: '', createdAt: Date.now() }
 }
 
+/**
+ * 把 `docs/periods.json`（构建时配置）规范化成运行时可用的期次 / 强化数据。
+ *
+ * 这是「运营配一次、所有访客看到同一套」的通道：
+ * 仓库里的这份文件在构建时被打进产物，访客首次打开（以及每次加载，
+ * 除非本地存在未发布的改动）都会以它为准。
+ */
+export function readPeriodConfig() {
+  const cfg = periodConfig || {}
+  const periods = (Array.isArray(cfg.periods) ? cfg.periods : [])
+    .filter((p) => p && p.id && p.name)
+    .map((p) => ({
+      id: String(p.id),
+      name: String(p.name),
+      sourceNote: p.sourceNote ? String(p.sourceNote) : '',
+      createdAt: Number(p.createdAt) || Date.now(),
+    }))
+  // 配置里没有期次时兜底一个，保证应用可用
+  if (!periods.length) periods.push({ id: 'p1', name: '第 1 期', sourceNote: '', createdAt: Date.now() })
+
+  const currentPeriodId = periods.some((p) => p.id === cfg.currentPeriodId)
+    ? cfg.currentPeriodId
+    : periods[0].id
+
+  /** 只保留结构合法的强化条目 */
+  const enhancements = {}
+  const rawEnh = cfg.enhancements && typeof cfg.enhancements === 'object' ? cfg.enhancements : {}
+  for (const [periodId, byChar] of Object.entries(rawEnh)) {
+    if (!byChar || typeof byChar !== 'object') continue
+    const clean = {}
+    for (const [charId, list] of Object.entries(byChar)) {
+      if (!Array.isArray(list)) continue
+      const items = list
+        .map((e, i) => ({
+          id: (e && e.id) || `cfg_${periodId}_${charId}_${i}`,
+          text: String((e && e.text) || '').trim(),
+          staminaPlus: Math.max(0, Number((e && e.staminaPlus) || 0)),
+        }))
+        .filter((e) => e.text || e.staminaPlus)
+      if (items.length) clean[charId] = items
+    }
+    if (Object.keys(clean).length) enhancements[periodId] = clean
+  }
+
+  return { periods, currentPeriodId, enhancements }
+}
+
+const REPO_CONFIG = readPeriodConfig()
+
 function normalizeCustom(c) {
   const el = elementByName(c.element)
   return {
@@ -40,7 +90,7 @@ function normalizeCustom(c) {
 
 /** 首次启动的默认状态 */
 function seedState() {
-  const p = makePeriod('第 1 期')
+  // 期次与强化以构建时配置（docs/periods.json）为准 —— 这样运营配一次、所有访客看到同一套
   return {
     schemaVersion: 1,
     theme: 'dark',
@@ -50,10 +100,16 @@ function seedState() {
     /** 角色持有：{ [charId]: false } 表示未持有；缺省视为持有 */
     owned: {},
     characters: BASE_ROSTER.map((c) => ({ ...c, modes: [...c.modes] })),
-    periods: [p],
-    currentPeriodId: p.id,
-    enhancements: { [p.id]: {} },
+    periods: REPO_CONFIG.periods.map((p) => ({ ...p })),
+    currentPeriodId: REPO_CONFIG.currentPeriodId,
+    enhancements: structuredClone(REPO_CONFIG.enhancements),
     teams: [makeTeam('配队1'), makeTeam('配队2')],
+    /**
+     * 本地是否对「期次 / 本期强化」做过未发布的改动。
+     * 为 true 时加载会保留本地数据（方便运营在 #admin 里编辑、导出），
+     * 为 false 时每次加载都用仓库配置覆盖 —— 保证访客总能拿到最新一期数据。
+     */
+    configDirty: false,
     /** 多模态选择（瞬态偏好，不进配队语义）：{ [charId]: 模态名 } */
     modeSelection: {},
     /** 当前点开（展开）的队伍 id —— 列表态下「点谁展开谁」 */
@@ -90,15 +146,31 @@ function hydrate(saved) {
     if (s.custom) characters.push(normalizeCustom(s))
   }
 
-  const periods = Array.isArray(saved.periods) && saved.periods.length ? saved.periods : fresh.periods
-  let currentPeriodId = saved.currentPeriodId
+  /*
+   * 期次与强化的取舍：
+   *   · 本地【没有】未发布的改动（configDirty=false）→ 一律用仓库配置覆盖，
+   *     保证访客每次打开都拿到运营最新发布的那一期数据。
+   *   · 本地【有】未发布的改动 → 保留本地，方便运营在 #admin 里编辑并导出。
+   */
+  const useRepoConfig = saved.configDirty !== true
+  const periods = useRepoConfig
+    ? fresh.periods
+    : Array.isArray(saved.periods) && saved.periods.length
+      ? saved.periods
+      : fresh.periods
+
+  let currentPeriodId = useRepoConfig ? fresh.currentPeriodId : saved.currentPeriodId
   if (!periods.some((p) => p.id === currentPeriodId)) currentPeriodId = periods[0].id
 
-  const enhancements = typeof saved.enhancements === 'object' && saved.enhancements ? saved.enhancements : {}
+  const enhancements = useRepoConfig
+    ? structuredClone(fresh.enhancements)
+    : typeof saved.enhancements === 'object' && saved.enhancements
+      ? saved.enhancements
+      : {}
   if (!enhancements[currentPeriodId]) enhancements[currentPeriodId] = {}
 
   const validIds = new Set(characters.map((c) => c.id))
-  const teams = (Array.isArray(saved.teams) && saved.teams.length ? saved.teams : fresh.teams).map((t) => ({
+  let teams = (Array.isArray(saved.teams) && saved.teams.length ? saved.teams : fresh.teams).map((t) => ({
     id: t.id || uid('team'),
     name: typeof t.name === 'string' ? t.name : '队伍',
     slots: Array.from({ length: SLOT_COUNT }, (_, i) => {
@@ -106,6 +178,10 @@ function hydrate(saved) {
       return v && validIds.has(v) ? v : null
     }),
   }))
+  // 期次变了（运营发布了新一期）→ 按「切期自动重置体力」的规则把队伍清空
+  if (useRepoConfig && saved.currentPeriodId && saved.currentPeriodId !== currentPeriodId) {
+    teams = teams.map((t) => ({ ...t, slots: t.slots.map(() => null) }))
+  }
 
   return {
     schemaVersion: 1,
@@ -120,6 +196,8 @@ function hydrate(saved) {
     currentPeriodId,
     enhancements,
     teams,
+    /** 本地是否有未发布的期次/强化改动 */
+    configDirty: saved.configDirty === true,
     modeSelection: typeof saved.modeSelection === 'object' && saved.modeSelection ? saved.modeSelection : {},
     selectedTeamId: typeof saved.selectedTeamId === 'string' ? saved.selectedTeamId : null,
     customAssets: typeof saved.customAssets === 'object' && saved.customAssets ? saved.customAssets : {},
@@ -551,11 +629,22 @@ export const useGameStore = defineStore('game', {
     },
 
     /* ---------------- 期次 ---------------- */
+    /*
+     * 注意：下面这些改动期次 / 强化的动作都会把 configDirty 置 true。
+     * 语义是「本地有尚未发布到仓库的配置改动」，此时加载会保留本地数据。
+     * 配好后用「导出期次配置」拿到 docs/periods.json，提交推送即全员生效，
+     * 之后点「恢复为仓库配置」清掉这个标记。
+     */
+    markConfigDirty() {
+      if (!this.configDirty) this.configDirty = true
+    },
+
     addPeriod(name, sourceNote = '') {
       const p = makePeriod(name || `第 ${this.periods.length + 1} 期`)
       p.sourceNote = sourceNote
       this.periods.push(p)
       this.enhancements[p.id] = {}
+      this.markConfigDirty()
       this.persist()
       return p
     },
@@ -564,6 +653,7 @@ export const useGameStore = defineStore('game', {
       const p = this.periods.find((x) => x.id === periodId)
       if (!p) return
       p.name = name
+      this.markConfigDirty()
       this.persist()
     },
 
@@ -574,6 +664,7 @@ export const useGameStore = defineStore('game', {
       this.periods.splice(i, 1)
       delete this.enhancements[periodId]
       if (this.currentPeriodId === periodId) this.currentPeriodId = this.periods[0].id
+      this.markConfigDirty()
       this.persist()
       return true
     },
@@ -583,7 +674,9 @@ export const useGameStore = defineStore('game', {
       if (!this.periods.some((p) => p.id === periodId)) return
       this.currentPeriodId = periodId
       if (!this.enhancements[periodId]) this.enhancements[periodId] = {}
-      this.resetStamina()    },
+      this.markConfigDirty()
+      this.resetStamina()
+    },
 
     /* ---------------- 本期强化 ---------------- */
     setEnhancements(periodId, charId, list) {
@@ -597,6 +690,7 @@ export const useGameStore = defineStore('game', {
         .filter((e) => e.text || e.staminaPlus)
       if (clean.length) this.enhancements[periodId][charId] = clean
       else delete this.enhancements[periodId][charId]
+      this.markConfigDirty()
       this.persist()
     },
 
@@ -606,6 +700,7 @@ export const useGameStore = defineStore('game', {
       const list = this.enhancements[p][charId] || []
       list.push({ id: uid('enh'), text: String(text || '').trim(), staminaPlus: Number(staminaPlus) || 0 })
       this.enhancements[p][charId] = list
+      this.markConfigDirty()
       this.persist()
     },
 
@@ -616,12 +711,57 @@ export const useGameStore = defineStore('game', {
       const next = list.filter((e) => e.id !== enhId)
       if (next.length) this.enhancements[p][charId] = next
       else delete this.enhancements[p][charId]
+      this.markConfigDirty()
       this.persist()
     },
 
     /** 清空本期全部角色强化（后台「全部删除」） */
     clearEnhancements(periodId = this.currentPeriodId) {
       this.enhancements[periodId] = {}
+      this.markConfigDirty()
+      this.persist()
+    },
+
+    /* ---------------- 期次配置的发布通道 ---------------- */
+
+    /**
+     * 导出成 `docs/periods.json` 的内容。
+     * 运营在 #admin 里配好 → 导出 → 用它替换仓库里的那份 → 提交推送 →
+     * Cloudflare 自动重建 → 所有访客看到同一套期次与强化。
+     */
+    exportPeriodConfig() {
+      const enhancements = {}
+      for (const [periodId, byChar] of Object.entries(this.enhancements)) {
+        if (!byChar || !Object.keys(byChar).length) continue
+        enhancements[periodId] = byChar
+      }
+      return {
+        $meta: {
+          name: '鸣潮·终焉矩阵 — 期次与本期强化配置',
+          note: [
+            '本文件决定【所有访客】打开时看到的期次与强化配置。改完提交推送，Cloudflare 会自动重新构建，全员生效。',
+            '推荐流程：在网页地址后加 #admin 打开后台 → 配好期次与强化 → 点「导出期次配置」→ 用它替换本文件 → 提交推送。',
+            'periods[].id 一旦发布就不要再改（本地存档靠它关联期次）；改名字请只改 name。',
+            'enhancements 结构：{ 期次id: { 角色id: [ { id, text, staminaPlus } ] } }',
+          ],
+        },
+        periods: this.periods.map((p) => ({
+          id: p.id,
+          name: p.name,
+          sourceNote: p.sourceNote || '',
+        })),
+        currentPeriodId: this.currentPeriodId,
+        enhancements,
+      }
+    },
+
+    /** 放弃本地未发布的期次/强化改动，恢复成仓库里发布的那一份 */
+    resetToRepoConfig() {
+      this.periods = REPO_CONFIG.periods.map((p) => ({ ...p }))
+      this.currentPeriodId = REPO_CONFIG.currentPeriodId
+      this.enhancements = structuredClone(REPO_CONFIG.enhancements)
+      this.configDirty = false
+      this.resetStamina()
       this.persist()
     },
 
@@ -724,6 +864,7 @@ export const useGameStore = defineStore('game', {
         modeSelection: this.modeSelection,
         selectedTeamId: this.selectedTeamId,
         customAssets: this.customAssets,
+        configDirty: this.configDirty,
         ui: { ...this.ui },
       }
     },

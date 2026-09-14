@@ -43,6 +43,12 @@ onMounted(() => {
   store.applyTheme()
   syncAdminFromHash()
   window.addEventListener('hashchange', syncAdminFromHash)
+  /*
+   * 启动时立刻写回一次本地存档。
+   * 加载时可能用仓库配置（docs/periods.json）覆盖了本地的期次/强化，
+   * 不写回的话 localStorage 里留的还是旧数据，界面与实际状态会对不上。
+   */
+  store.persist()
   const plan = readPlanFromLocation()
   if (plan) pendingPlan.value = plan
 })
