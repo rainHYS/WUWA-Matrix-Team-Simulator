@@ -1,7 +1,14 @@
 # Cloudflare Pages 项目配置
 # ------------------------------------------------------------
-# 把这个文件放进仓库，Cloudflare Pages 会读取 pages_build_output_dir，
-# 不必再依赖控制台里的手填设置（之前就是输出目录填错导致白屏）。
+# 这个文件让 Pages 的「构建输出目录」随仓库走，不必在控制台手填。
+# 实测有效，构建日志里会打印：
+#   Found wrangler.toml file. Reading build configuration...
+#   pages_build_output_dir: dist
+#
+# ⚠️ 但它**只能**配输出目录这类字段 —— **构建命令无法写在这里**，
+#    必须去控制台 Settings → Builds & deployments 填 `npm run build`。
+#    否则构建日志会显示「No build command specified. Skipping build step.」，
+#    紧接着因为仓库里没有 dist/ 而报「Output directory "dist" not found.」
 #
 # name 必须与 Cloudflare Pages 上的项目名一致。
 name = "wuwa-matrix-team-simulator"
